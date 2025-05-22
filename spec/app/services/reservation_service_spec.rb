@@ -20,5 +20,22 @@ RSpec.describe ReservationService do
         quantity: 1,
       )
     end
+
+    context 'when quantity exceeds available stock' do
+      let(:quantity) { item.stock_quantity + 1 }
+
+      it 'does not oversell stock' do
+        expect { service.call }
+          .to change(Reservation, :count)
+          .from(0).to(1)
+          .and change { item.reload.stock_quantity }.from(1).to(0)
+
+        expect(Reservation.first).to have_attributes(
+          item_id: item.id,
+          worker_id: worker.id,
+          quantity: 1,
+        )
+      end
+    end
   end
 end
