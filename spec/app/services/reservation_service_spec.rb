@@ -37,5 +37,19 @@ RSpec.describe ReservationService do
         )
       end
     end
+
+    context 'when updating stock quantity fails' do
+      before do
+        allow_any_instance_of(Item)
+          .to receive(:update!)
+          .and_raise(StandardError, 'test error')
+      end
+
+      it 'doesnt save reservation' do
+        expect { service.call }
+          .to raise_error(StandardError, 'test error')
+          .and change(Reservation, :count).by(0)
+      end
+    end
   end
 end

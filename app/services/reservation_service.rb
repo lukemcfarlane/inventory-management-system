@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 class ReservationService
-  def initialize(item_id:, worker_id: , quantity: 5)
+  def initialize(item_id:, worker_id:, quantity:)
     @item_id = item_id
     @worker_id = worker_id
     @requested_quantity = quantity
   end
 
   def call
-    create_reservation!
-    update_stock_quantity!
+    ActiveRecord::Base.transaction do
+      create_reservation!
+      update_stock_quantity!
+    end
 
     reservation
   end
@@ -19,7 +21,7 @@ class ReservationService
   attr_reader :item_id, :worker_id, :requested_quantity, :reservation
 
   def quantity
-    [ requested_quantity, item.stock_quantity ].min
+    [requested_quantity, item.stock_quantity].min
   end
 
   def create_reservation!
@@ -35,6 +37,6 @@ class ReservationService
   end
 
   def item
-    Item.find(item_id)
+    @item ||= Item.find(item_id)
   end
 end
