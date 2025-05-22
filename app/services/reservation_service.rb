@@ -21,5 +21,11 @@ class ReservationService
       item_id: item_id,
       quantity: quantity,
     )
+
+    item.update!(stock_quantity: item.stock_quantity - quantity)
+  end
+
+  def item
+    Item.find(item_id)
   end
 end
