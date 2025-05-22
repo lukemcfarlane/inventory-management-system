@@ -8,10 +8,18 @@ class ReservationService
   end
 
   def call
-    raise NotImplementedError.new
+    create_reservation!
   end
 
   private
 
   attr_reader :item_id, :worker_id, :quantity
+
+  def create_reservation!
+    Reservation.create!(
+      worker_id: worker_id,
+      item_id: item_id,
+      quantity: quantity,
+    )
+  end
 end
